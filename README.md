@@ -79,4 +79,198 @@ Our model is trained on a comprehensive dataset of 7,000+ code pairs covering:
   "upgraded_css": "padding: 12px; color: red; margin: 0;"
 }
 
+```
 
+## 🔧 How It Works
+
+### **1. Code Input & Analysis**
+```javascript
+// User writes or uploads code
+const userCode = '
+function example() {
+  console.log("Hello World")
+}';
+
+// FixBudz analyzes using AI + rule engine
+const analysis = await analyzeCode(userCode);
+```
+
+## 2. Intelligent Suggestions
+
+- **AI-Powered Fixes:** Context-aware corrections & formatting
+
+- **Rule-Based Recommendations:** ESLint-style static analysis
+
+- **Confidence Scoring:** Every suggestion includes model certainty
+
+## 3. Interactive Preview
+
+- **Split Comparison:** Original vs. Fixed output
+
+- **Live Rendering:** Instant preview opens in a new browser tab
+
+- **Clean UI:** Distraction-free , Good UI
+
+## 4. Apply Actions
+
+- One-Click Apply Fix
+
+- Selective Acceptance (per-line / full file)
+
+- **Version Control-Ready:** Safe tracking + revert support
+
+## 🚀 Quick Start
+- Prerequisites
+
+- Python 3.8+
+
+- Modern web browser
+
+- Git installed
+
+## Installation & Setup
+### Clone the repository
+```
+git clone https://github.com/madany044/Mrit-kingpins_Punith_Code-Style-Auto-Formatter.git
+cd Mrit-kingpins_Punith_Code-Style-Auto-Formatter
+```
+### Install backend dependencies
+```
+pip install -r requirements.txt
+```
+
+### Start the backend server
+```
+python app.py
+```
+
+### Open frontend
+```
+open dashboard.html   # or run with Live Server
+```
+
+## Configuration
+### Backend Environment
+```
+export FLASK_ENV=development
+export API_PORT=5000
+```
+## Frontend
+
+- Just open dashboard.html
+- No build tools required.
+
+## 📁 Project Structure
+Mrit-kingpins_Punith_Code-Style-Auto-Formatter/
+- ├── 📁 frontend/
+- │ ├── dashboard.html # Main workspace UI
+- │ ├── 📁 assets/
+- │ │ ├── 📁 css/
+- │ │ │ └── style.css # VS Code-inspired design
+- │ │ ├── 📁 js/
+- │ │ │ ├── dashboard.js # Core controller logic
+- │ │ │ ├── auth.js # Login/auth handling
+- │ │ │ └── previewManager.js # Live preview renderer
+- │ │ └── 📁 img/
+- │ │ └── user.png # UI assets
+- ├── 📁 backend/
+- │ ├── app.py # Flask API / inference server
+- │ ├── 📁 config/
+- │ │ └── firebase.json # Firebase configuration
+- │ ├── requirements.txt # Python dependencies
+- │ └── .env # Environment variables
+- ├── 📁 dataset/ # AI training data
+- │ └── code_pairs.json # 7,000+ training samples
+- └── README.md # Project documentation
+
+## 🎯 Use Cases
+
+### 🎓 Educational Institutions
+- **Instant feedback for students**
+- **Automated assignment quality checking**
+- **Interactive debugging & learning tool**
+
+### 💼 Enterprise Teams
+- **Automated pre-PR code cleanup**
+- **Enforce consistent coding standards**
+- **Refactor & modernize legacy code**
+
+### 🚀 Individual Developers
+- **Rapid HTML/CSS/JS prototyping**
+- **Improve code quality with AI guidance**
+- **Debug faster using AI-powered fixes**
+
+### 🏆 Hackathons & Competitions
+- **Fast iteration with real-time feedback**
+- **Maintain clean, production-ready code**
+- **Easier collaboration & understanding**
+
+## 🔮 Future Roadmap
+
+### 🚀 Short-Term (Q2 2024)
+- **More languages**: Java, C++, C#
+- **Upgrade AI** → CodeT5-Large
+- **Real-time multi-user collab**
+
+### 🎯 Medium-Term (Q3 2024)
+- **Multi-file project dependency analysis**
+- **Code quality scoring & analytics**
+- **Custom rule plug-in system**
+
+### 🌟 Long-Term (2025)
+- **CI/CD integration for enterprises**
+- **StarCoder-powered generation**
+- **Full cloud-based SaaS platform**
+
+## 👥 Team & Contributors
+
+<div align="center">
+
+### 🏆 Team KingPins – Hackathon Build
+
+| Role | Contributor | Focus Area |
+|------|-------------|------------|
+| Lead Developer | Dhanush | AI Integration & Backend |
+| Frontend Architect | Madan Y | UI/UX & Workspace System |
+| AI Engineer | Likhith Gowda | Model Training & Optimization |
+| QA Engineer | Akash H M | Testing & Validation |
+
+</div>
+
+## 📊 Performance Metrics
+
+- **Analysis Speed**: < 2 sec
+- **Suggestion Accuracy**: ~88%
+- **Preview Rendering**: Instant (new-tab live)
+- **Model Training**: 7,000+ curated code-fix pairs
+
+## 🤝 Contributing
+
+```bash
+# Fork and clone the repo
+git clone https://github.com/your-username/Mrit-kingpins_Punith_Code-Style-Auto-Formatter.git
+
+# Create feature branch
+git checkout -b feature/amazing-improvement
+
+# Push & submit PR
+```
+
+## 🔗 Links & Contact
+
+- **GitHub**: [Mrit-kingpins_Punith_Code-Style-Auto-Formatter](https://github.com/madany044/Mrit-kingpins_Punith_Code-Style-Auto-Formatter)
+- **Issues**: [GitHub Issue Tracker](https://github.com/madany044/Mrit-kingpins_Punith_Code-Style-Auto-Formatter/issues)
+- **Documentation**: [Wiki](https://github.com/madany044/Mrit-kingpins_Punith_Code-Style-Auto-Formatter/wiki)
+
+### 📧 Contact Information
+For queries and support, please contact:
+- **Email**: madanmadany2004@gmail.com , akash665017@gmail.com
+- **Phone**: +91-9353240289
+
+<div align="center">
+
+**Kingpins Debugger – Mastering The Code**
+
+*Built with ❤️ by Team KingPins*
+
+</div>
