@@ -5,7 +5,6 @@
 **A professional debugging workspace that uses advanced AI to detect, fix, and enhance code quality in real-time.**
 
 [![GitHub](https://img.shields.io/badge/GitHub-Repository-blue?logo=github)](https://github.com/madany044/Mrit-kingpins_Punith_Code-Style-Auto-Formatter)
-[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/Python-3.8%2B-blue?logo=python)](https://python.org)
 [![AI Powered](https://img.shields.io/badge/AI-Powered-orange?logo=ai)](https://huggingface.co)
 
