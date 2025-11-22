@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KingPins Debugger | Register</title>
+    <link rel="stylesheet" href="./assets/css/style.css">
+</head>
+
+<body>
+    <section class="auth-section">
+        <header>
+            <div class="container header-container">
+                <a class="logo" href="./welcome.html">KingPins</a>
+                <nav class="nav-links">
+                    <a href="./login.html">Login</a>
+                    <a href="./register.html" class="cta-button">Create Account</a>
+                </nav>
+            </div>
+        </header>
+
+        <main class="auth-card" role="form" aria-labelledby="register-title">
+            <p class="card-pill" aria-hidden="true">New to FixBudz?</p>
+            <h2 id="register-title">Create your workspace</h2>
+
+            <div class="auth-status" data-auth-status role="status" aria-live="polite"></div>
+            <form id="registerForm">
+                <div class="form-group">
+                    <label for="name">Full Name</label>
+                    <input id="name" name="name" type="text" placeholder="Ada Lovelace" required aria-required="true">
+                </div>
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input id="email" name="email" type="email" placeholder="developer@kingpins.dev" required aria-required="true">
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input id="password" data-password name="password" type="password" required aria-required="true" minlength="8" aria-describedby="strength-helper">
+                    <div class="strength-meter" aria-hidden="true" data-strength-meter>
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                    <small id="strength-helper">Use at least 8 characters with uppercase, number, and symbol.</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="confirm">Confirm Password</label>
+                    <input id="confirm" name="confirm" type="password" required aria-required="true">
+                </div>
+
+                <div class="form-group">
+                    <label for="handle">Preferred Handle</label>
+                    <input id="handle" name="handle" type="text" placeholder="@lintmaster">
+                </div>
+
+                <div class="form-footer">
+                    <button type="button" class="link-button" onclick="window.location.href='./login.html'">Already registered?</button>
+                    <button type="submit" class="primary-button">Register &amp; Verify</button>
+                </div>
+            </form>
+        </main>
+    </section>
+
+    <script src="./assets/js/app.js"></script>
+    <script type="module" src="./assets/js/auth.js"></script>
+</body>
+
+</html>
+

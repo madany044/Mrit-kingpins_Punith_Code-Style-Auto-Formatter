@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KingPins Debugger | Welcome</title>
+    <link rel="stylesheet" href="./assets/css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27><text y=%27.9em%27 font-size=%2790%27>🛠️</text></svg>">
+</head>
+
+<body>
+    <header aria-label="Primary">
+        <div class="container header-container">
+            <div class="logo">KingPins • FixBudz</div>
+            <nav class="nav-links" aria-label="primary navigation">
+                <a href="./welcome.html">Home</a>
+                <a href="./dashboard.html">Dashboard</a>
+                <a href="./login.html">Login</a>
+                <a href="./register.html" class="cta-button">Register</a>
+            </nav>
+        </div>
+    </header>
+
+    <section class="hero">
+        <div class="container">
+            <p class="card-pill">AI + Developer Experience</p>
+            <h1>WELCOME TO KINGPINS DEBUGGER</h1>
+            <p>
+                Data-driven linting, Monaco-powered editing, and CodeT5-small suggestions for clean code on every push.
+            </p>
+            <a class="cta-button" href="./dashboard.html">Launch Workspace</a>
+        </div>
+    </section>
+
+    <section class="grid-section">
+        <div class="container">
+            <div class="grid-container">
+                <article class="grid-item">
+                    <h3>Auto-format + Lint</h3>
+                    <p>Instant static checks with ESLint / Prettier style alignment. Diff view highlights added, modified, and removed lines with tooltips.</p>
+                    <span class="card-pill">Ctrl+Enter • Run Suggestion</span>
+                </article>
+
+                <article class="grid-item">
+                    <h3>AI CodeT5 Pipeline</h3>
+                    <p>Fine-tuned CodeT5-small model on CodeXGLUE + ManySStuBs4J to recommend repairs with severity, rule id, and confidence.</p>
+                    <span class="card-pill">Socket.IO progress</span>
+                </article>
+
+                    <article class="grid-item">
+                        <h3>Developer-first UI</h3>
+                        <p>VS Code style layout with Monaco Editor, diff-highlighter, suggestion console, and actions like Apply Fix, Copy, Accept All.</p>
+                        <span class="card-pill">Undo / Redo friendly</span>
+                    </article>
+
+                    <article class="grid-item">
+                        <h3>Secure & Connected</h3>
+                        <p>JWT-authenticated sessions, Firestore persistence, and Firebase rules to protect user drafts, suggestions, and contact messages.</p>
+                        <span class="card-pill">Federated auth ready</span>
+                    </article>
+            </div>
+        </div>
+    </section>
+
+    <section class="grid-section">
+        <div class="container">
+            <div class="grid-container">
+                <article class="grid-item">
+                    <h3>How it Works</h3>
+                    <ol>
+                        <li>Login with JWT-secured account.</li>
+                        <li>Load project via File dropdown (file/folder/upload).</li>
+                        <li>Run DEBUG to lint, SUGGESTION to invoke CodeT5, PREVIEW for web files.</li>
+                        <li>Apply or reject fixes; stream inference logs in console.</li>
+                    </ol>
+                </article>
+                <article class="grid-item">
+                    <h3>Stack Preview</h3>
+                    <ul>
+                        <li>Frontend: HTML, CSS, Vanilla JS, Monaco, diff-match-patch.</li>
+                        <li>Backend: Flask + Socket.IO for lint + model orchestration.</li>
+                        <li>DB: Firebase Firestore for user projects & suggestion metadata.</li>
+                        <li>Model: CodeT5-small fine-tune for lint fixes.</li>
+                    </ul>
+                </article>
+                <article class="grid-item">
+                    <h3>Why KingPins Debugger?</h3>
+                    <p>Ship consistent code faster with AI-assisted linting, accessible UI, and developer-friendly keyboard shortcuts. Built for hackathons and beyond.</p>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <div class="footer-grid" role="navigation" aria-label="footer links">
+        <a href="#about">About</a>
+        <a href="#docs">Docs</a>
+        <a href="#privacy">Privacy</a>
+        <a href="#contact">Contact</a>
+    </div>
+
+    <footer>
+        <div class="container footer-content">
+            <div class="footer-section" id="about">
+                <h3>About KingPins</h3>
+                <p>We craft ML-first developer tooling to accelerate clean code delivery and bring AI linting to every repo.</p>
+            </div>
+            <div class="footer-section" id="docs">
+                <h3>Docs</h3>
+                <ul>
+                    <li><a href="./docs/spec.html">Product Spec</a></li>
+                    <li><a href="./docs/api.html">API</a></li>
+                    <li><a href="./docs/model.html">Model Pipeline</a></li>
+                </ul>
+            </div>
+            <div class="footer-section" id="privacy">
+                <h3>Privacy</h3>
+                <p>JWT-backed sessions, encrypted storage, and admin-only Firestore reads for contact data.</p>
+            </div>
+            <div class="footer-section" id="contact">
+                <h3>Contact</h3>
+                <ul>
+                    <li><a href="mailto:team@kingpins.ai">team@kingpins.ai</a></li>
+                    <li><a href="#">Discord</a></li>
+                    <li><a href="#">X / Twitter</a></li>
+                </ul>
+            </div>
+        </div>
+        <p class="copyright">
+            © 2025 KingPins Debugger · Built at Hackathon 2025 · All rights reserved.
+        </p>
+    </footer>
+</body>
+
+</html>
+

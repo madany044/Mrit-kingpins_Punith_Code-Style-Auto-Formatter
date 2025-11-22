@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KingPins Debugger | Login</title>
+    <link rel="stylesheet" href="./assets/css/style.css">
+</head>
+
+<body>
+    <section class="auth-section">
+        <header>
+            <div class="container header-container">
+                <a class="logo" href="./welcome.html">KingPins</a>
+                <nav class="nav-links">
+                    <a href="./register.html">Register</a>
+                    <a href="./login.html" class="cta-button">Login</a>
+                </nav>
+            </div>
+        </header>
+
+        <main class="auth-card" role="form" aria-labelledby="login-title">
+            <p class="card-pill" aria-hidden="true">Secure access • JWT</p>
+            <h2 id="login-title">Welcome back</h2>
+
+            <div class="auth-status" data-auth-status role="status" aria-live="polite"></div>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input id="email" name="email" type="email" placeholder="coder@kingpins.dev" required aria-required="true">
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input id="password" name="password" type="password" required aria-required="true">
+                </div>
+
+                <div class="form-footer">
+                    <button type="button" class="link-button" onclick="alert('Password reset email coming soon.')">Forgot password?</button>
+                    <button type="submit" class="primary-button">Login</button>
+                </div>
+            </form>
+        </main>
+    </section>
+
+    <script src="./assets/js/app.js"></script>
+    <script type="module" src="./assets/js/auth.js"></script>
+</body>
+
+</html>
+

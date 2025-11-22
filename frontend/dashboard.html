@@ -1,0 +1,1142 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FixBudz Workspace | KingPins Debugger</title>
+    <link rel="stylesheet" href="./assets/css/style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/diff-match-patch/1.0.5/diff_match_patch.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs/loader.min.js" defer></script>
+    <style>
+        /* AI Integration Styles */
+        .btn-ai {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .btn-ai:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .action-buttons {
+            margin: 15px 0;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .ai-suggestion-content {
+            max-height: 60vh;
+            overflow-y: auto;
+            padding: 10px 0;
+        }
+
+        .suggestion-loading {
+            text-align: center;
+            padding: 40px 20px;
+            color: #666;
+        }
+
+        .loading-spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .suggestion-section {
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .suggestion-section:last-child {
+            border-bottom: none;
+        }
+
+        .suggestion-section h4 {
+            margin-bottom: 10px;
+            color: #2c3e50;
+            font-size: 16px;
+        }
+
+        .code-preview {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 6px;
+            padding: 15px;
+            margin: 10px 0;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .code-preview pre {
+            margin: 0;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 12px;
+            line-height: 1.4;
+            white-space: pre-wrap;
+        }
+
+        .explanations-list, .additional-suggestions {
+            padding: 10px 0;
+        }
+
+        .explanation-item, .suggestion-item {
+            padding: 8px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .explanation-item:last-child, .suggestion-item:last-child {
+            border-bottom: none;
+        }
+
+        .suggestion-error {
+            text-align: center;
+            padding: 40px 20px;
+            color: #e74c3c;
+            background: #fdf2f2;
+            border-radius: 6px;
+        }
+
+        .text-suggestions {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 6px;
+            white-space: pre-wrap;
+            font-family: monospace;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        /* Quick fix button */
+        .btn-secondary {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.3s ease;
+        }
+
+        .btn-secondary:hover {
+            background: #2980b9;
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .action-buttons {
+                flex-direction: column;
+            }
+            
+            .ai-suggestion-content {
+                max-height: 50vh;
+            }
+            
+            .modal-card {
+                margin: 10px;
+                width: calc(100% - 20px);
+            }
+        }
+    </style>
+</head>
+
+<body class="app-shell">
+    <!-- Status banner for logout messages -->
+    <div data-auth-status class="status-banner" style="display: none;"></div>
+    <header class="top-bar" aria-label="workspace top bar">
+        <div class="actions" aria-label="history controls">
+            <button class="icon-button" aria-label="Undo (Ctrl+Z)">
+                ⤺
+            </button>
+            <button class="icon-button" aria-label="Redo (Ctrl+Y)">
+                ⤻
+            </button>
+        </div>
+        <div class="top-bar-title">FixBudz</div>
+        <div class="profile-menu">
+            <img src="assets/img/user.png" alt="Profile avatar" class="user-avatar">
+            <span class="user-name">Loading...</span>
+            <button class="logout-btn">Logout</button>
+        </div>
+    </header>
+
+    <main class="workspace" role="main">
+        <aside class="sidebar" aria-label="Project explorer">
+            <div class="file-dropdown">
+                <button type="button" id="file-dropdown-btn" aria-haspopup="true" aria-expanded="false">
+                    File
+                    <span>⌄</span>
+                </button>
+                <div class="dropdown-menu" id="file-dropdown-menu">
+                    <button data-modal-target="fileModal">Choose File</button>
+                    <button data-modal-target="folderModal">Choose Folder</button>
+                    <button data-modal-target="createModal">Create New</button>
+                    <button data-modal-target="uploadModal">Upload</button>
+                    <button data-modal-target="recentModal">Recent Files</button>
+                </div>
+            </div>
+
+            <div class="explorer">
+                <h4>Explorer</h4>
+                <ul class="tree" role="tree">
+                    <li role="treeitem" aria-expanded="true">src/</li>
+                    <li role="treeitem"> ┣ format/
+                        <ul>
+                            <li>formatter.py</li>
+                            <li>rules.json</li>
+                        </ul>
+                    </li>
+                    <li role="treeitem"> ┗ web/
+                        <ul>
+                            <li>dashboard.js</li>
+                            <li>main.css</li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Add AI Action Buttons to Sidebar -->
+            <div class="action-buttons">
+                <button id="ai-suggest-btn" class="btn btn-ai">
+                    🧠 Get AI Suggestions
+                </button>
+                <button id="quick-fix-btn" class="btn btn-secondary">
+                    ⚡ Quick Fix
+                </button>
+            </div>
+
+            <div class="sidebar-actions" aria-label="workspace actions">
+                <button type="button" data-console-tab="debug">Debug</button>
+                <button type="button" id="preview-button">Preview</button>
+                <button type="button" data-console-tab="suggestion" data-run-suggestion>Suggestion</button>
+            </div>
+        </aside>
+
+        <section class="main-editor">
+            <div class="breadcrumb-bar">
+                <span id="current-file">kingpins/workspaces/lint-runner.js</span>
+                <div class="breadcrumb-actions">
+                    <button class="icon-button" id="save-file" aria-label="Save file (Ctrl+S)">💾</button>
+                    <button class="icon-button" id="download-file" aria-label="Download file">⬇</button>
+                </div>
+            </div>
+
+            <div class="workspace-body">
+                <section class="editor-pane">
+                    <div class="pane-header">
+                        <h5>User Code</h5>
+                        <span class="metadata-pill">Lint gutter active</span>
+                    </div>
+                    <div class="editor monaco-placeholder" aria-live="polite">
+                        <textarea id="user-code-input" style="width: 100%; height: 300px; font-family: monospace; padding: 10px; border: 1px solid #ddd; border-radius: 4px;">
+// TODO: integrate Monaco Editor instance
+import { formatCode } from './formatter';
+
+const lintRun = async (code) => {
+    const report = await lint(code);
+    return report;
+};
+
+// Press Ctrl+Enter to run suggestions
+                        </textarea>
+                    </div>
+                </section>
+
+                <section class="suggested-pane">
+                    <div class="pane-header">
+                        <h5>Suggested Code</h5>
+                        <div class="metadata-pill">Model confidence: 0.88</div>
+                    </div>
+                    <div class="diff-view" data-diff aria-live="polite">
+                        <!-- diff lines injected by JS -->
+                    </div>
+                    <div class="suggestion-metadata">
+                        <div class="metadata-pill">Rule: eslint:no-unused-vars</div>
+                        <div class="metadata-pill">Severity: warning</div>
+                    </div>
+                    <div class="suggestion-actions">
+                        <button data-apply="apply">Apply Fix</button>
+                        <button data-apply="copy">Copy Code</button>
+                        <button class="primary" data-apply="accept-all">Accept All</button>
+                        <button data-apply="reject-all">Reject All</button>
+                    </div>
+                </section>
+            </div>
+        </section>
+
+        <section class="suggestion-pane" aria-label="Aggregated suggestions">
+            <div class="pane-header">
+                <h5>Insights</h5>
+                <label>
+                    <input type="checkbox" checked> Unified Diff
+                </label>
+            </div>
+            <div class="diff-view suggestion-list">
+                <article class="suggestion-item">
+                    <strong>no-console</strong>
+                    <p>Toggled debug log removal</p>
+                    <small>Confidence: 0.71 • Line 42</small>
+                </article>
+                <article class="suggestion-item">
+                    <strong>indent</strong>
+                    <p>Standardized indentation to 2 spaces.</p>
+                    <small>Confidence: 0.89 • Line 68-74</small>
+                </article>
+                <article class="suggestion-item">
+                    <strong>semi</strong>
+                    <p>Ensured trailing semicolons; safe apply recommended.</p>
+                    <small>Confidence: 0.94 • Line 88</small>
+                </article>
+            </div>
+        </section>
+    </main>
+
+    <section class="bottom-console" aria-label="console area">
+        <div class="console-tabs">
+            <button class="active" data-console-tab="debug">Debug</button>
+            <button data-console-tab="suggestion">Suggestion</button>
+            <button data-console-tab="console">Console</button>
+            <button data-console-tab="preview">Preview</button>
+        </div>
+        <div class="console-panel" data-console-panel="debug">
+            <pre>
+{
+  "rule": "no-console",
+  "message": "Unexpected console statement.",
+  "line": 42,
+  "severity": "warning"
+}
+            </pre>
+        </div>
+
+        <div class="console-panel" data-console-panel="console" hidden>
+            <!-- Logs will appear here -->
+        </div>
+
+        <!-- Preview Panel (will show instruction message) -->
+        <div class="console-panel" data-console-panel="preview" hidden style="padding:20px; text-align:center;">
+            <button id="open-preview-from-console" style="background: #3498db; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; margin-top: 10px;">
+                Open Preview in New Tab
+            </button>
+        </div>
+        
+        <div class="console-panel" data-console-tab="suggestion" hidden>
+            <div class="suggestion-list">
+                <div class="suggestion-item">
+                    <strong>[12:01:02]</strong> Remove unused import os.
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Modals -->
+    <div class="modal" id="fileModal" aria-modal="true" role="dialog">
+        <div class="modal-card">
+            <h3>Select File</h3>
+            <input type="file" id="fileInput" aria-label="choose file">
+            <div class="modal-actions">
+                <button class="secondary-btn" data-modal-close>Cancel</button>
+                <button class="primary-btn-dark" id="openFileBtn">Open</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="folderModal" aria-modal="true" role="dialog">
+        <div class="modal-card">
+            <h3>Load Folder</h3>
+            <p>Drag a folder here or select from disk.</p>
+            <input type="file" id="folderInput" webkitdirectory multiple aria-label="choose folder">
+            <div class="modal-actions">
+                <button class="secondary-btn" data-modal-close>Cancel</button>
+                <button class="primary-btn-dark" id="loadFolderBtn">Load</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="createModal" aria-modal="true" role="dialog">
+        <div class="modal-card">
+            <h3>Create New File</h3>
+            <label>
+                Filename
+                <input type="text" id="newFileName" placeholder="formatter.ts">
+            </label>
+            <label>
+                Language
+                <select id="fileLanguage">
+                    <option value="javascript">JavaScript</option>
+                    <option value="typescript">TypeScript</option>
+                    <option value="python">Python</option>
+                    <option value="html">HTML</option>
+                    <option value="css">CSS</option>
+                </select>
+            </label>
+            <div class="modal-actions">
+                <button class="secondary-btn" data-modal-close>Cancel</button>
+                <button class="primary-btn-dark" id="createFileBtn">Create</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="uploadModal" aria-modal="true" role="dialog">
+        <div class="modal-card">
+            <h3>Upload Files</h3>
+            <input type="file" id="uploadFiles" multiple>
+            <p>Supports drag and drop for up to 20 files.</p>
+            <div class="modal-actions">
+                <button class="secondary-btn" data-modal-close>Cancel</button>
+                <button class="primary-btn-dark" id="uploadFilesBtn">Upload</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="recentModal" aria-modal="true" role="dialog">
+        <div class="modal-card">
+            <h3>Recent Files</h3>
+            <ul id="recentFilesList">
+                <li><button class="file-link" data-file="lint-runner.js">lint-runner.js</button></li>
+                <li><button class="file-link" data-file="formatter.py">formatter.py</button></li>
+                <li><button class="file-link" data-file="preview.html">preview.html</button></li>
+            </ul>
+            <div class="modal-actions">
+                <button class="secondary-btn" data-modal-close>Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI Suggestion Modal -->
+    <div class="modal" id="aiSuggestionModal" aria-modal="true" role="dialog">
+        <div class="modal-card" style="max-width: 800px;">
+            <h3>🤖 AI Code Suggestions</h3>
+            <div class="ai-suggestion-content">
+                <div class="suggestion-loading" id="ai-loading" style="display: none;">
+                    <div class="loading-spinner"></div>
+                    <p>Analyzing your code with AI...</p>
+                </div>
+                <div class="suggestion-results" id="ai-results" style="display: none;">
+                    <div class="suggestion-section">
+                        <h4>Corrected Code:</h4>
+                        <div class="code-preview" id="ai-corrected-code"></div>
+                        <button class="btn btn-primary" id="apply-ai-correction">Apply This Correction</button>
+                    </div>
+                    <div class="suggestion-section">
+                        <h4>Explanations:</h4>
+                        <div class="explanations-list" id="ai-explanations"></div>
+                    </div>
+                    <div class="suggestion-section">
+                        <h4>Additional Suggestions:</h4>
+                        <div class="additional-suggestions" id="ai-additional-suggestions"></div>
+                    </div>
+                </div>
+                <div class="suggestion-error" id="ai-error" style="display: none;">
+                    <p>❌ Failed to get AI suggestions. Please try again.</p>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="secondary-btn" data-modal-close>Close</button>
+                <button class="primary-btn-dark" id="retry-ai-analysis" style="display: none;">Retry</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="./assets/js/auth.js"></script>
+    <script type="module" src="./assets/js/dashboard.js"></script>
+    <script type="module" src="./assets/js/ai-integration.js"></script>    
+    <script>
+        // Enhanced Linter with AI Integration
+        class EnhancedLinter {
+            constructor() {
+                this.aiService = new AISuggestionService();
+                this.currentAISuggestions = null;
+                this.editor = null;
+            }
+
+            setEditor(editor) {
+                this.editor = editor;
+            }
+
+            async analyzeWithAI() {
+                if (!this.editor) {
+                    this.showError('No editor available');
+                    return;
+                }
+
+                const code = this.getEditorValue();
+                const language = this.getCurrentLanguage();
+                const lintIssues = this.aiService.extractLintIssuesFromCode(code, language);
+                
+                try {
+                    this.showLoadingState();
+                    
+                    const aiSuggestions = await this.aiService.getAISuggestions(
+                        code, 
+                        language, 
+                        lintIssues
+                    );
+                    
+                    this.currentAISuggestions = aiSuggestions;
+                    this.displayAISuggestions(aiSuggestions);
+                    
+                } catch (error) {
+                    this.showError('Failed to get AI suggestions: ' + error.message);
+                } finally {
+                    this.hideLoadingState();
+                }
+            }
+
+            getEditorValue() {
+                if (this.editor && typeof this.editor.getValue === 'function') {
+                    return this.editor.getValue();
+                } else if (this.editor && this.editor.value !== undefined) {
+                    return this.editor.value;
+                } else {
+                    const textarea = document.getElementById('user-code-input');
+                    return textarea ? textarea.value : '';
+                }
+            }
+
+            getCurrentLanguage() {
+                const currentFile = document.getElementById('current-file').textContent;
+                if (currentFile.endsWith('.js')) return 'javascript';
+                if (currentFile.endsWith('.ts')) return 'typescript';
+                if (currentFile.endsWith('.py')) return 'python';
+                if (currentFile.endsWith('.html')) return 'html';
+                if (currentFile.endsWith('.css')) return 'css';
+                return 'javascript'; // default
+            }
+
+            displayAISuggestions(suggestions) {
+                const modal = document.getElementById('aiSuggestionModal');
+                const loading = document.getElementById('ai-loading');
+                const results = document.getElementById('ai-results');
+                const error = document.getElementById('ai-error');
+                
+                if (!modal) return;
+
+                // Hide loading and error
+                loading.style.display = 'none';
+                error.style.display = 'none';
+                
+                if (suggestions.type === 'code_correction') {
+                    // Display code correction
+                    const correctedCodeEl = document.getElementById('ai-corrected-code');
+                    const explanationsEl = document.getElementById('ai-explanations');
+                    const additionalEl = document.getElementById('ai-additional-suggestions');
+                    
+                    if (correctedCodeEl) {
+                        correctedCodeEl.innerHTML = `<pre><code>${this.escapeHtml(suggestions.correctedCode)}</code></pre>`;
+                    }
+                    
+                    if (explanationsEl) {
+                        explanationsEl.innerHTML = suggestions.explanations
+                            .map(exp => `<div class="explanation-item">• ${this.escapeHtml(exp)}</div>`)
+                            .join('');
+                    }
+                    
+                    if (additionalEl) {
+                        additionalEl.innerHTML = suggestions.additionalSuggestions
+                            .map(sugg => `<div class="suggestion-item">💡 ${this.escapeHtml(sugg)}</div>`)
+                            .join('');
+                    }
+                    
+                    results.style.display = 'block';
+                } else {
+                    // Display text suggestions
+                    results.innerHTML = `<div class="text-suggestions">${this.escapeHtml(suggestions.content)}</div>`;
+                    results.style.display = 'block';
+                }
+                
+                modal.style.display = 'flex';
+            }
+
+            showLoadingState() {
+                const modal = document.getElementById('aiSuggestionModal');
+                const loading = document.getElementById('ai-loading');
+                const results = document.getElementById('ai-results');
+                const error = document.getElementById('ai-error');
+                
+                if (modal && loading) {
+                    results.style.display = 'none';
+                    error.style.display = 'none';
+                    loading.style.display = 'block';
+                    modal.style.display = 'flex';
+                }
+            }
+
+            hideLoadingState() {
+                const loading = document.getElementById('ai-loading');
+                if (loading) {
+                    loading.style.display = 'none';
+                }
+            }
+
+            showError(message) {
+                const modal = document.getElementById('aiSuggestionModal');
+                const loading = document.getElementById('ai-loading');
+                const results = document.getElementById('ai-results');
+                const error = document.getElementById('ai-error');
+                const retryBtn = document.getElementById('retry-ai-analysis');
+                
+                if (modal && error) {
+                    loading.style.display = 'none';
+                    results.style.display = 'none';
+                    error.style.display = 'block';
+                    error.innerHTML = `<p>❌ ${this.escapeHtml(message)}</p>`;
+                    retryBtn.style.display = 'inline-block';
+                    modal.style.display = 'flex';
+                }
+            }
+
+            applyCurrentSuggestion() {
+                if (this.currentAISuggestions && this.currentAISuggestions.correctedCode) {
+                    const success = this.aiService.applyAICorrection(this.editor, this.currentAISuggestions.correctedCode);
+                    if (success) {
+                        this.showNotification('AI correction applied successfully!', 'success');
+                        document.getElementById('aiSuggestionModal').style.display = 'none';
+                    } else {
+                        this.showNotification('Failed to apply correction', 'error');
+                    }
+                }
+            }
+
+            escapeHtml(unsafe) {
+                if (!unsafe) return '';
+                return unsafe
+                    .replace(/&/g, "&amp;")
+                    .replace(/</g, "&lt;")
+                    .replace(/>/g, "&gt;")
+                    .replace(/"/g, "&quot;")
+                    .replace(/'/g, "&#039;");
+            }
+
+            showNotification(message, type = 'success') {
+                const banner = document.querySelector('[data-auth-status]');
+                if (banner) {
+                    banner.textContent = message;
+                    banner.style.display = 'block';
+                    banner.style.background = type === 'error' ? '#e74c3c' : '#2ecc71';
+                    
+                    setTimeout(() => {
+                        banner.style.display = 'none';
+                    }, 3000);
+                } else {
+                    alert(message);
+                }
+            }
+
+            applyQuickFixes() {
+                const code = this.getEditorValue();
+                const language = this.getCurrentLanguage();
+                
+                let fixedCode = code;
+                
+                if (language === 'javascript' || language === 'typescript') {
+                    // Apply simple quick fixes
+                    fixedCode = fixedCode.replace(/var\s+(\w+)/g, 'let $1');
+                    fixedCode = fixedCode.replace(/console\.log\(([^)]+)\);/g, '// console.log($1);');
+                    
+                    // Add missing semicolons
+                    const lines = fixedCode.split('\n');
+                    fixedCode = lines.map(line => {
+                        const trimmed = line.trim();
+                        if (trimmed && !trimmed.endsWith(';') && !trimmed.endsWith('{') && 
+                            !trimmed.endsWith('}') && !trimmed.startsWith('//') && 
+                            !trimmed.startsWith('/*') && !trimmed.endsWith('*/') &&
+                            !trimmed.includes('function') && !trimmed.includes('if') &&
+                            !trimmed.includes('for') && !trimmed.includes('while')) {
+                            return line + ';';
+                        }
+                        return line;
+                    }).join('\n');
+                }
+                
+                if (this.editor) {
+                    if (typeof this.editor.setValue === 'function') {
+                        this.editor.setValue(fixedCode);
+                    } else if (this.editor.value !== undefined) {
+                        this.editor.value = fixedCode;
+                    }
+                    this.showNotification('Quick fixes applied!', 'success');
+                }
+            }
+        }
+
+        // AI Suggestion Service
+        class AISuggestionService {
+            constructor() {
+                this.baseURL = '/api';
+                this.isAnalyzing = false;
+            }
+
+            async getAISuggestions(code, language, lintIssues = []) {
+                if (this.isAnalyzing) {
+                    throw new Error('Analysis already in progress');
+                }
+
+                this.isAnalyzing = true;
+                
+                try {
+                    const response = await fetch(`${this.baseURL}/ai-suggestions`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            code: code,
+                            language: language,
+                            issues: lintIssues
+                        })
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        return this.processAISuggestions(data.suggestions);
+                    } else {
+                        throw new Error(data.error || 'Failed to get AI suggestions');
+                    }
+                } catch (error) {
+                    console.error('Error getting AI suggestions:', error);
+                    throw error;
+                } finally {
+                    this.isAnalyzing = false;
+                }
+            }
+
+            processAISuggestions(suggestions) {
+                if (suggestions.corrected_code) {
+                    return {
+                        type: 'code_correction',
+                        correctedCode: suggestions.corrected_code,
+                        explanations: Array.isArray(suggestions.explanations) ? 
+                            suggestions.explanations : [suggestions.explanations || 'No explanations provided'],
+                        additionalSuggestions: Array.isArray(suggestions.additional_suggestions) ? 
+                            suggestions.additional_suggestions : [suggestions.additional_suggestions || 'No additional suggestions']
+                    };
+                } else if (suggestions.raw_response) {
+                    return {
+                        type: 'text_suggestions',
+                        content: suggestions.raw_response
+                    };
+                }
+                
+                return suggestions;
+            }
+
+            applyAICorrection(editor, correctedCode) {
+                if (editor && correctedCode) {
+                    if (typeof editor.setValue === 'function') {
+                        editor.setValue(correctedCode);
+                    } else if (editor.value !== undefined) {
+                        editor.value = correctedCode;
+                    }
+                    return true;
+                }
+                return false;
+            }
+
+            extractLintIssuesFromCode(code, language) {
+                const issues = [];
+                
+                if (language === 'javascript' || language === 'typescript') {
+                    if (code.includes('console.log')) {
+                        issues.push('Unexpected console statement (no-console)');
+                    }
+                    if (code.match(/var\s+\w+/)) {
+                        issues.push('Use const/let instead of var');
+                    }
+                    if (!code.includes(';') && code.trim().length > 0) {
+                        issues.push('Missing semicolons');
+                    }
+                    if (code.match(/function\s*\([^)]*\)\s*{/)) {
+                        issues.push('Consider using arrow functions for better style');
+                    }
+                }
+                
+                if (language === 'python') {
+                    if (code.match(/print\s+[^(]/)) {
+                        issues.push('Print should be used as function: print()');
+                    }
+                    if (code.match(/==\s*True/)) {
+                        issues.push('Direct truthiness checking preferred over == True');
+                    }
+                }
+
+                return issues.length > 0 ? issues : ['Code style could be improved for better readability and maintainability'];
+            }
+        }
+
+        // File Management and Modal Functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize enhanced linter
+            const enhancedLinter = new EnhancedLinter();
+            window.enhancedLinter = enhancedLinter;
+
+            // Set up editor reference
+            const textareaEditor = document.getElementById('user-code-input');
+            enhancedLinter.setEditor(textareaEditor);
+
+            // AI Suggestion Button
+            const aiSuggestBtn = document.getElementById('ai-suggest-btn');
+            if (aiSuggestBtn) {
+                aiSuggestBtn.addEventListener('click', () => {
+                    enhancedLinter.analyzeWithAI();
+                });
+            }
+
+            // Quick Fix Button
+            const quickFixBtn = document.getElementById('quick-fix-btn');
+            if (quickFixBtn) {
+                quickFixBtn.addEventListener('click', () => {
+                    enhancedLinter.applyQuickFixes();
+                });
+            }
+
+            // Apply AI Correction Button
+            const applyCorrectionBtn = document.getElementById('apply-ai-correction');
+            if (applyCorrectionBtn) {
+                applyCorrectionBtn.addEventListener('click', () => {
+                    enhancedLinter.applyCurrentSuggestion();
+                });
+            }
+
+            // Retry AI Analysis Button
+            const retryBtn = document.getElementById('retry-ai-analysis');
+            if (retryBtn) {
+                retryBtn.addEventListener('click', () => {
+                    enhancedLinter.analyzeWithAI();
+                });
+            }
+
+            // Keyboard shortcut for AI suggestions (Ctrl+Shift+A)
+            document.addEventListener('keydown', function(e) {
+                if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'A') {
+                    e.preventDefault();
+                    enhancedLinter.analyzeWithAI();
+                }
+            });
+
+            // Modal functionality
+            const modals = document.querySelectorAll('.modal');
+            const modalTriggers = document.querySelectorAll('[data-modal-target]');
+            const closeButtons = document.querySelectorAll('[data-modal-close]');
+
+            // Open modal
+            modalTriggers.forEach(trigger => {
+                trigger.addEventListener('click', function() {
+                    const modalId = this.getAttribute('data-modal-target');
+                    const modal = document.getElementById(modalId.replace('#', ''));
+                    if (modal) {
+                        modal.style.display = 'flex';
+                    }
+                });
+            });
+
+            // Close modal
+            closeButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const modal = this.closest('.modal');
+                    if (modal) {
+                        modal.style.display = 'none';
+                    }
+                });
+            });
+
+            // Close modal when clicking outside
+            modals.forEach(modal => {
+                modal.addEventListener('click', function(e) {
+                    if (e.target === this) {
+                        this.style.display = 'none';
+                    }
+                });
+            });
+
+            // File dropdown functionality
+            const fileDropdownBtn = document.getElementById('file-dropdown-btn');
+            const fileDropdownMenu = document.getElementById('file-dropdown-menu');
+
+            if (fileDropdownBtn && fileDropdownMenu) {
+                fileDropdownBtn.addEventListener('click', function() {
+                    const isExpanded = this.getAttribute('aria-expanded') === 'true';
+                    this.setAttribute('aria-expanded', !isExpanded);
+                    fileDropdownMenu.style.display = isExpanded ? 'none' : 'block';
+                });
+
+                // Close dropdown when clicking outside
+                document.addEventListener('click', function(e) {
+                    if (!fileDropdownBtn.contains(e.target) && !fileDropdownMenu.contains(e.target)) {
+                        fileDropdownBtn.setAttribute('aria-expanded', 'false');
+                        fileDropdownMenu.style.display = 'none';
+                    }
+                });
+            }
+
+            // File operations
+            const userCodeInput = document.getElementById('user-code-input');
+            const currentFileElement = document.getElementById('current-file');
+
+            // Open File functionality
+            document.getElementById('openFileBtn').addEventListener('click', function() {
+                const fileInput = document.getElementById('fileInput');
+                const file = fileInput.files[0];
+                
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        userCodeInput.value = e.target.result;
+                        currentFileElement.textContent = file.name;
+                        document.getElementById('fileModal').style.display = 'none';
+                        fileInput.value = '';
+                        showNotification(`File "${file.name}" loaded successfully!`);
+                    };
+                    reader.readAsText(file);
+                } else {
+                    showNotification('Please select a file first!', 'error');
+                }
+            });
+
+            // Load Folder functionality
+            document.getElementById('loadFolderBtn').addEventListener('click', function() {
+                const folderInput = document.getElementById('folderInput');
+                if (folderInput.files.length > 0) {
+                    showNotification(`Folder with ${folderInput.files.length} files loaded!`);
+                    document.getElementById('folderModal').style.display = 'none';
+                    folderInput.value = '';
+                } else {
+                    showNotification('Please select a folder first!', 'error');
+                }
+            });
+
+            // Create New File functionality
+            document.getElementById('createFileBtn').addEventListener('click', function() {
+                const fileName = document.getElementById('newFileName').value.trim();
+                const language = document.getElementById('fileLanguage').value;
+                
+                if (fileName) {
+                    // Set default content based on language
+                    let defaultContent = '';
+                    switch(language) {
+                        case 'javascript':
+                            defaultContent = `// ${fileName}\nconsole.log('Hello World');`;
+                            break;
+                        case 'typescript':
+                            defaultContent = `// ${fileName}\nconst message: string = 'Hello World';\nconsole.log(message);`;
+                            break;
+                        case 'python':
+                            defaultContent = `# ${fileName}\nprint("Hello World")`;
+                            break;
+                        case 'html':
+                            defaultContent = `<!DOCTYPE html>\n<html>\n<head>\n    <title>${fileName}</title>\n</head>\n<body>\n    <h1>Hello World</h1>\n</body>\n</html>`;
+                            break;
+                        case 'css':
+                            defaultContent = `/* ${fileName} */\nbody {\n    margin: 0;\n    padding: 0;\n}`;
+                            break;
+                        default:
+                            defaultContent = `// ${fileName}`;
+                    }
+                    
+                    userCodeInput.value = defaultContent;
+                    currentFileElement.textContent = fileName;
+                    document.getElementById('createModal').style.display = 'none';
+                    document.getElementById('newFileName').value = '';
+                    showNotification(`New file "${fileName}" created!`);
+                } else {
+                    showNotification('Please enter a filename!', 'error');
+                }
+            });
+
+            // Upload Files functionality
+            document.getElementById('uploadFilesBtn').addEventListener('click', function() {
+                const uploadInput = document.getElementById('uploadFiles');
+                if (uploadInput.files.length > 0) {
+                    showNotification(`${uploadInput.files.length} files uploaded successfully!`);
+                    document.getElementById('uploadModal').style.display = 'none';
+                    uploadInput.value = '';
+                } else {
+                    showNotification('Please select files to upload!', 'error');
+                }
+            });
+
+            // Recent Files functionality
+            document.querySelectorAll('.file-link').forEach(link => {
+                link.addEventListener('click', function() {
+                    const fileName = this.getAttribute('data-file');
+                    // Load sample content based on file extension
+                    let sampleContent = '';
+                    if (fileName.endsWith('.js')) {
+                        sampleContent = `// ${fileName}\nfunction main() {\n    console.log("Loaded from recent files");\n}\nmain();`;
+                    } else if (fileName.endsWith('.py')) {
+                        sampleContent = `# ${fileName}\ndef main():\n    print("Loaded from recent files")\n\nif __name__ == "__main__":\n    main()`;
+                    } else if (fileName.endsWith('.html')) {
+                        sampleContent = `<!DOCTYPE html>\n<html>\n<head>\n    <title>${fileName}</title>\n</head>\n<body>\n    <h1>Loaded from recent files</h1>\n</body>\n</html>`;
+                    }
+                    
+                    userCodeInput.value = sampleContent;
+                    currentFileElement.textContent = fileName;
+                    document.getElementById('recentModal').style.display = 'none';
+                    showNotification(`Recent file "${fileName}" loaded!`);
+                });
+            });
+
+            // Save File functionality
+            document.getElementById('save-file').addEventListener('click', function() {
+                const content = userCodeInput.value;
+                const fileName = currentFileElement.textContent;
+                
+                const blob = new Blob([content], { type: 'text/plain' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = fileName;
+                a.click();
+                URL.revokeObjectURL(url);
+                
+                showNotification(`File "${fileName}" saved!`);
+            });
+
+            // Download File functionality
+            document.getElementById('download-file').addEventListener('click', function() {
+                const content = userCodeInput.value;
+                const fileName = currentFileElement.textContent;
+                
+                const blob = new Blob([content], { type: 'text/plain' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = fileName;
+                a.click();
+                URL.revokeObjectURL(url);
+                
+                showNotification(`File "${fileName}" downloaded!`);
+            });
+
+            // Preview functionality
+            const previewButton = document.getElementById('preview-button');
+            const consolePreviewButton = document.getElementById('open-preview-from-console');
+            
+            function openPreview() {
+                const userCode = userCodeInput.value;
+                const previewWindow = window.open('', '_blank');
+                
+                previewWindow.document.write(`
+                    <!DOCTYPE html>
+                    <html lang="en">
+                    <head>
+                        <meta charset="UTF-8">
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                        <title>Code Preview - FixBudz</title>
+                        <style>
+                            body { margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #1e1e1e; color: #fff; }
+                            .preview-header { background: #2c3e50; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #34495e; }
+                            .preview-content { padding: 20px; display: flex; flex-direction: column; gap: 20px; }
+                            .code-section, .output-section { background: #2d2d2d; border-radius: 8px; padding: 20px; border: 1px solid #404040; }
+                            h2, h3 { margin: 0 0 15px 0; color: #3498db; }
+                            .code-display { background: #1e1e1e; border: 1px solid #404040; border-radius: 4px; padding: 15px; overflow-x: auto; font-family: 'Courier New', monospace; white-space: pre-wrap; color: #d4d4d4; }
+                            .output-frame { width: 100%; height: 500px; border: 1px solid #404040; border-radius: 4px; background: white; }
+                            .back-btn { background: #e74c3c; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-size: 14px; }
+                            .back-btn:hover { background: #c0392b; }
+                            .tab-buttons { display: flex; gap: 10px; margin-bottom: 15px; }
+                            .tab-btn { padding: 8px 16px; background: #34495e; border: none; border-radius: 4px; color: white; cursor: pointer; }
+                            .tab-btn.active { background: #3498db; }
+                        </style>
+                    </head>
+                    <body>
+                        <div class="preview-header">
+                            <h2>🔍 Code Preview - FixBudz</h2>
+                            <button class="back-btn" onclick="window.close()">Close Preview</button>
+                        </div>
+                        <div class="preview-content">
+                            <div class="code-section">
+                                <h3>📝 Your Code:</h3>
+                                <div class="code-display">${userCode.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</div>
+                            </div>
+                            <div class="output-section">
+                                <h3>🚀 Output Preview:</h3>
+                                <div class="tab-buttons">
+                                    <button class="tab-btn active" onclick="showTab('html-output')">HTML Render</button>
+                                    <button class="tab-btn" onclick="showTab('raw-output')">Raw Output</button>
+                                </div>
+                                <div id="html-output" class="output-container">
+                                    ${userCode.includes('<html') || userCode.includes('<div') || userCode.includes('<body') ? 
+                                        `<iframe class="output-frame" srcdoc="${userCode.replace(/"/g, '&quot;')}"></iframe>` :
+                                        '<p>No HTML content detected for rendering.</p>'
+                                    }
+                                </div>
+                                <div id="raw-output" class="output-container" style="display: none;">
+                                    <div class="code-display">${userCode.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <script>
+                            function showTab(tabName) {
+                                document.querySelectorAll('.output-container').forEach(tab => tab.style.display = 'none');
+                                document.getElementById(tabName).style.display = 'block';
+                                document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+                                event.target.classList.add('active');
+                            }
+                        <\/script>
+                    </body>
+                    </html>
+                `);
+                previewWindow.document.close();
+            }
+            
+            if (previewButton) previewButton.addEventListener('click', openPreview);
+            if (consolePreviewButton) consolePreviewButton.addEventListener('click', openPreview);
+
+            // Console tabs functionality
+            const consoleTabs = document.querySelectorAll('[data-console-tab]');
+            consoleTabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const tabName = this.getAttribute('data-console-tab');
+                    
+                    // Update active tab
+                    consoleTabs.forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Show corresponding panel
+                    document.querySelectorAll('.console-panel').forEach(panel => {
+                        panel.hidden = true;
+                    });
+                    document.querySelector(`[data-console-panel="${tabName}"]`).hidden = false;
+                });
+            });
+
+            // Notification function
+            function showNotification(message, type = 'success') {
+                const banner = document.querySelector('[data-auth-status]');
+                banner.textContent = message;
+                banner.style.display = 'block';
+                banner.style.background = type === 'error' ? '#e74c3c' : '#2ecc71';
+                
+                setTimeout(() => {
+                    banner.style.display = 'none';
+                }, 3000);
+            }
+        });
+    </script>
+</body>
+</html>
