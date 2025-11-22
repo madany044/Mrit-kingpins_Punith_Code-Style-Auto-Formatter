@@ -1,4 +1,4 @@
-#  AI-Powered Code Linter & Auto-Formatter
+# The AI-Powered Code Linter & Auto-Formatter
 
 <div align="center">
 
