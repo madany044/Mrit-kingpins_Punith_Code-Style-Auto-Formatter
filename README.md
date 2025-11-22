@@ -2,9 +2,7 @@
 
 <div align="center">
 
-![FixBudz Banner](https://via.placeholder.com/800x200/2c3e50/ffffff?text=FixBudz+AI+Code+Formatter)
-
-**A professional VS Code-style debugging workspace that uses advanced AI to detect, fix, and enhance code quality in real-time.**
+**A professional debugging workspace that uses advanced AI to detect, fix, and enhance code quality in real-time.**
 
 [![GitHub](https://img.shields.io/badge/GitHub-Repository-blue?logo=github)](https://github.com/madany044/Mrit-kingpins_Punith_Code-Style-Auto-Formatter)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
