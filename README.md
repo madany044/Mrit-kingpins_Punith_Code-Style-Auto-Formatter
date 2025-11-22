@@ -1,4 +1,4 @@
-# FixBudz – AI-Powered Code Linter & Auto-Formatter
+#  AI-Powered Code Linter & Auto-Formatter
 
 <div align="center">
 
