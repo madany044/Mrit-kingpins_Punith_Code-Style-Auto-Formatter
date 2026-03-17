@@ -157,29 +157,6 @@ export API_PORT=5000
 - Just open dashboard.html
 - No build tools required.
 
-## 📁 Project Structure
-Mrit-kingpins_Punith_Code-Style-Auto-Formatter/
-- ├── 📁 frontend/
-- │ ├── dashboard.html # Main workspace UI
-- │ ├── 📁 assets/
-- │ │ ├── 📁 css/
-- │ │ │ └── style.css # VS Code-inspired design
-- │ │ ├── 📁 js/
-- │ │ │ ├── dashboard.js # Core controller logic
-- │ │ │ ├── auth.js # Login/auth handling
-- │ │ │ └── previewManager.js # Live preview renderer
-- │ │ └── 📁 img/
-- │ │ └── user.png # UI assets
-- ├── 📁 backend/
-- │ ├── app.py # Flask API / inference server
-- │ ├── 📁 config/
-- │ │ └── firebase.json # Firebase configuration
-- │ ├── requirements.txt # Python dependencies
-- │ └── .env # Environment variables
-- ├── 📁 dataset/ # AI training data
-- │ └── code_pairs.json # 7,000+ training samples
-- └── README.md # Project documentation
-
 ## 🎯 Use Cases
 
 ### 🎓 Educational Institutions
@@ -202,22 +179,6 @@ Mrit-kingpins_Punith_Code-Style-Auto-Formatter/
 - **Maintain clean, production-ready code**
 - **Easier collaboration & understanding**
 
-## 🔮 Future Roadmap
-
-### 🚀 Short-Term (Q2 2024)
-- **More languages**: Java, C++, C#
-- **Upgrade AI** → CodeT5-Large
-- **Real-time multi-user collab**
-
-### 🎯 Medium-Term (Q3 2024)
-- **Multi-file project dependency analysis**
-- **Code quality scoring & analytics**
-- **Custom rule plug-in system**
-
-### 🌟 Long-Term (2025)
-- **CI/CD integration for enterprises**
-- **StarCoder-powered generation**
-- **Full cloud-based SaaS platform**
 
 ## 👥 Team & Contributors
 
@@ -255,7 +216,7 @@ git checkout -b feature/amazing-improvement
 
 ## 🔗 Links & Contact
 
-- **GitHub**: [Mrit-kingpins_Punith_Code-Style-Auto-Formatter](https://github.com/madany044/Mrit-kingpins_Punith_Code-Style-Auto-Formatter)
+- **GitHub**: [Code_Style_AutoFormatter](https://github.com/madany044/Code_Style_AutoFormatter)
 - **Issues**: [GitHub Issue Tracker](https://github.com/madany044/Mrit-kingpins_Punith_Code-Style-Auto-Formatter/issues)
 - **Documentation**: [Wiki](https://github.com/madany044/Mrit-kingpins_Punith_Code-Style-Auto-Formatter/wiki)
 
